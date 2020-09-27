@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 501072989717594885}
   - component: {fileID: 4544306120140878482}
   - component: {fileID: 7624070639085666790}
-  - component: {fileID: 1247788135004111113}
   m_Layer: 0
   m_Name: Rain
   m_TagString: Untagged
@@ -114,6 +113,8 @@ MonoBehaviour:
   floaterCount: 1
   waterDrag: 0.99
   waterAngularDrag: 0.5
+  water: 1
+  originalPos: {x: 0, y: 0, z: 0}
 --- !u!54 &7624070639085666790
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -130,18 +131,3 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &1247788135004111113
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2804962386636161644}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d29316160cd8204488e0552bea24c9b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  originalPos: {fileID: 250751675511928379}
-  normSpeed: 10
-  self: {fileID: 2804962386636161644}
