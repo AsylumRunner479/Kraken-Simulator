@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Mirror
-  m_Shader: {fileID: 4800000, guid: a4c2033fd945a394686b0c509f00634d, type: 3}
+  m_Shader: {fileID: 4800000, guid: 0e9ffce71ef96964caf8af6de6adf5e8, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
@@ -23,8 +23,16 @@ Material:
         m_Texture: {fileID: 2800000, guid: 16d574e53541bba44a84052fa38778df, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Texture1:
+        m_Texture: {fileID: 2800000, guid: 16d574e53541bba44a84052fa38778df, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _TextureSample0:
         m_Texture: {fileID: 2800000, guid: bdbe94d7623ec3940947b62544306f1c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample1:
+        m_Texture: {fileID: 2800000, guid: 16d574e53541bba44a84052fa38778df, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _texcoord:
@@ -32,12 +40,18 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - _AlphaCutoff: 0.5
     - _Metallic: 1
+    - _Metallic1: 0
     - __dirty: 0
     - _light: 0
+    - _light1: 1
     m_Colors:
     - _Color0: {r: 0, g: 0, b: 0, a: 0}
     - _Color1: {r: 2.670157, g: 2.670157, b: 2.670157, a: 0}
     - _Color2: {r: 0, g: 0, b: 0, a: 0}
     - _Color3: {r: 0, g: 0, b: 0, a: 0}
+    - _Color4: {r: 0, g: 0, b: 0, a: 0}
+    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _Speed: {r: 0, g: -0.01, b: 0, a: 0}
+    - _Speed1: {r: 0, g: -0.01, b: 0, a: 0}
