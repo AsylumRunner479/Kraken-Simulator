@@ -776,21 +776,22 @@ namespace AmplifyShaderEditor
 		
 		private static Dictionary<WirePortDataType, int> m_portPriority = new Dictionary<WirePortDataType, int>()
 		{
-			{WirePortDataType.OBJECT,       0},
-			{WirePortDataType.SAMPLERSTATE, 0},
-			{WirePortDataType.SAMPLER1D,    0},
-			{WirePortDataType.SAMPLER2D,    0},
-			{WirePortDataType.SAMPLER3D,    0},
-			{WirePortDataType.SAMPLERCUBE,  0},
-			{WirePortDataType.SAMPLER2DARRAY,  0},
-			{WirePortDataType.FLOAT3x3,     1},
-			{WirePortDataType.FLOAT4x4,     2},
-			{WirePortDataType.INT,          3},
-			{WirePortDataType.FLOAT,        4},
-			{WirePortDataType.FLOAT2,       5},
-			{WirePortDataType.FLOAT3,       6},
-			{WirePortDataType.FLOAT4,       7},
-			{WirePortDataType.COLOR,        7}
+			{WirePortDataType.OBJECT,			0},
+			{WirePortDataType.SAMPLERSTATE,		0},
+			{WirePortDataType.SAMPLER1D,		0},
+			{WirePortDataType.SAMPLER2D,		0},
+			{WirePortDataType.SAMPLER3D,		0},
+			{WirePortDataType.SAMPLERCUBE,		0},
+			{WirePortDataType.SAMPLER2DARRAY,	0},
+			{WirePortDataType.FLOAT3x3,			1},
+			{WirePortDataType.FLOAT4x4,			2},
+			{WirePortDataType.INT,				3},
+			{WirePortDataType.UINT,				3},
+			{WirePortDataType.FLOAT,			4},
+			{WirePortDataType.FLOAT2,			5},
+			{WirePortDataType.FLOAT3,			6},
+			{WirePortDataType.FLOAT4,			7},
+			{WirePortDataType.COLOR,			7}
 		};
 
 		private static readonly string IncorrectInputConnectionErrorMsg = "Input Port {0} from node {1} has type {2}\nwhich is incompatible with connection of type {3} from port {4} on node {5}";
@@ -1502,6 +1503,11 @@ namespace AmplifyShaderEditor
 							result = ( useRealValue ) ? ( (int)value ).ToString() : "(int)" + parameterName;
 						}
 						break;
+						case WirePortDataType.UINT:
+						{
+							result = ( useRealValue ) ? ( (int)value ).ToString() : "(uint)" + parameterName;
+						}
+						break;
 					}
 				}
 				break;
@@ -1759,10 +1765,56 @@ namespace AmplifyShaderEditor
 							result = ( useRealValue ) ? ( (int)value ).ToString() : "(float)" + parameterName;
 						}
 						break;
+						case WirePortDataType.UINT:
+						{
+							result = ( useRealValue ) ? ( (int)value ).ToString() : "(uint)" + parameterName;
+						}
+						break;
 					}
 				}
 				break;
-
+				case WirePortDataType.UINT:
+				{
+					switch( newType )
+					{
+						case WirePortDataType.OBJECT: result = useRealValue ? value.ToString() : parameterName; break;
+						case WirePortDataType.FLOAT2:
+						case WirePortDataType.FLOAT3:
+						case WirePortDataType.COLOR:
+						case WirePortDataType.FLOAT4:
+						{
+							string localVal = CreateLocalValueName( currentPrecision, newType, localVarName, ( ( useRealValue ) ? value.ToString() : parameterName ) );
+							dataCollector.AddToLocalVariables( dataCollector.PortCategory, -1, localVal );
+							result = localVarName;
+						}
+						break;
+						case WirePortDataType.FLOAT3x3:
+						{
+							string localVal = CreateLocalValueName( currentPrecision, oldType, localVarName, ( ( useRealValue ) ? value.ToString() : parameterName ) );
+							dataCollector.AddToLocalVariables( dataCollector.PortCategory, -1, localVal );
+							result = localVarName;
+						}
+						break;
+						case WirePortDataType.FLOAT4x4:
+						{
+							string localVal = CreateLocalValueName( currentPrecision, oldType, localVarName, ( ( useRealValue ) ? value.ToString() : parameterName ) );
+							dataCollector.AddToLocalVariables( dataCollector.PortCategory, -1, localVal );
+							result = localVarName;
+						}
+						break;
+						case WirePortDataType.FLOAT:
+						{
+							result = ( useRealValue ) ? ( (int)value ).ToString() : "(float)" + parameterName;
+						}
+						break;
+						case WirePortDataType.INT:
+						{
+							result = ( useRealValue ) ? ( (int)value ).ToString() : "(int)" + parameterName;
+						}
+						break;
+					}
+				}
+				break;
 			}
 			if( result.Equals( string.Empty ) )
 			{

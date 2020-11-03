@@ -632,7 +632,10 @@ namespace AmplifyShaderEditor
 					string finalVarName = m_currentTemplateData.FragmentFunctionData.InVarName + "." + availableInterp.VarNameWithSwizzle;
 					m_availableFragData.Add( TemplateHelperFunctions.IntToUVChannelInfo[ UVChannel ], new InterpDataHelper( size, finalVarName ) );
 					if( size != originalSize )
-						finalVarName = m_currentTemplateData.FragmentFunctionData.InVarName + "." + availableInterp.VarName+ UIUtils.GetAutoSwizzle( originalSize );
+					{
+						//finalVarName = m_currentTemplateData.FragmentFunctionData.InVarName + "." + availableInterp.VarName + UIUtils.GetAutoSwizzle( originalSize );
+						finalVarName = m_availableFragData[ TemplateHelperFunctions.IntToUVChannelInfo[ UVChannel ] ].VarName  + UIUtils.GetAutoSwizzle( originalSize );
+					}
 					return finalVarName;
 				}
 			}
@@ -928,6 +931,20 @@ namespace AmplifyShaderEditor
 			}
 
 			return resetInstrucctions;
+		}
+
+		public bool ContainsSpecialLocalFragVar( TemplateInfoOnSematics info, WirePortDataType type, ref string result )
+		{
+			if( m_specialFragmentLocalVars.ContainsKey( info ) )
+			{
+				result = m_specialFragmentLocalVars[ info ].LocalVarName;
+				if( m_specialFragmentLocalVars[ info ].DataType != type )
+				{
+					result = TemplateHelperFunctions.AutoSwizzleData( result, m_specialFragmentLocalVars[ info ].DataType, type, false );
+				}
+				return true;
+			}
+			return false;
 		}
 
 		public bool GetCustomInterpolatedData( TemplateInfoOnSematics info, WirePortDataType type, PrecisionType precisionType, ref string result, bool useMasterNodeCategory, MasterNodePortCategory customCategory )

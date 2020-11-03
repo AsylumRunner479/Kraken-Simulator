@@ -148,6 +148,8 @@ Shader /*ase_name*/ "Hidden/Universal/PBR" /*end*/
 				false:RemoveDefine:pragma multi_compile_fog
 				true:SetDefine:ASE_FOG 1
 				false:RemoveDefine:ASE_FOG 1
+			Option,_FinalColorxAlpha:Final Color x Alpha:true,false:false
+				true:SetDefine:ASE_FINAL_COLOR_ALPHA_MULTIPLY 1
 			Option:Meta Pass:false,true:true
 				true:IncludePass:Meta
 				false,disable:ExcludePass:Meta
@@ -633,6 +635,10 @@ Shader /*ase_name*/ "Hidden/Universal/PBR" /*end*/
 			#define REQUIRES_VERTEX_SHADOW_COORD_INTERPOLATOR
 			#endif
 
+			#if defined(UNITY_INSTANCING_ENABLED) && defined(_TERRAIN_INSTANCED_PERPIXEL_NORMAL)
+			    #define ENABLE_TERRAIN_PERPIXEL_NORMAL
+			#endif
+
 			/*ase_pragma*/
 
 			struct VertexInput
@@ -641,7 +647,8 @@ Shader /*ase_name*/ "Hidden/Universal/PBR" /*end*/
 				float3 ase_normal : NORMAL;
 				float4 ase_tangent : TANGENT;
 				float4 texcoord1 : TEXCOORD1;
-				/*ase_vdata:p=p;n=n;t=t;uv1=tc1.xyzw*/
+				float4 texcoord : TEXCOORD0;
+				/*ase_vdata:p=p;n=n;t=t;uv0=tc0;uv1=tc1.xyzw*/
 				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
@@ -723,6 +730,11 @@ Shader /*ase_name*/ "Hidden/Universal/PBR" /*end*/
 				OUTPUT_LIGHTMAP_UV( v.texcoord1, unity_LightmapST, o.lightmapUVOrVertexSH.xy );
 				OUTPUT_SH( normalInput.normalWS.xyz, o.lightmapUVOrVertexSH.xyz );
 
+				#if defined(ENABLE_TERRAIN_PERPIXEL_NORMAL)
+					o.lightmapUVOrVertexSH.zw = v.texcoord;
+					o.lightmapUVOrVertexSH.xy = v.texcoord * unity_LightmapST.xy + unity_LightmapST.zw;
+				#endif
+
 				half3 vertexLight = VertexLighting( positionWS, normalInput.normalWS );
 				#ifdef ASE_FOG
 					half fogFactor = ComputeFogFactor( positionCS.z );
@@ -751,6 +763,7 @@ Shader /*ase_name*/ "Hidden/Universal/PBR" /*end*/
 				float4 vertex : INTERNALTESSPOS;
 				float3 ase_normal : NORMAL;
 				float4 ase_tangent : TANGENT;
+				float4 texcoord : TEXCOORD0;
 				float4 texcoord1 : TEXCOORD1;
 				/*ase_vcontrol*/
 				UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -770,6 +783,7 @@ Shader /*ase_name*/ "Hidden/Universal/PBR" /*end*/
 				o.vertex = v.vertex;
 				o.ase_normal = v.ase_normal;
 				o.ase_tangent = v.ase_tangent;
+				o.texcoord = v.texcoord;
 				o.texcoord1 = v.texcoord1;
 				/*ase_control_code:v=VertexInput;o=VertexControl*/
 				return o;
@@ -811,6 +825,7 @@ Shader /*ase_name*/ "Hidden/Universal/PBR" /*end*/
 				o.vertex = patch[0].vertex * bary.x + patch[1].vertex * bary.y + patch[2].vertex * bary.z;
 				o.ase_normal = patch[0].ase_normal * bary.x + patch[1].ase_normal * bary.y + patch[2].ase_normal * bary.z;
 				o.ase_tangent = patch[0].ase_tangent * bary.x + patch[1].ase_tangent * bary.y + patch[2].ase_tangent * bary.z;
+				o.texcoord = patch[0].texcoord * bary.x + patch[1].texcoord * bary.y + patch[2].texcoord * bary.z;
 				o.texcoord1 = patch[0].texcoord1 * bary.x + patch[1].texcoord1 * bary.y + patch[2].texcoord1 * bary.z;
 				/*ase_domain_code:patch=VertexControl;o=VertexInput;bary=SV_DomainLocation*/
 				#if defined(ASE_PHONG_TESSELLATION)
@@ -839,9 +854,16 @@ Shader /*ase_name*/ "Hidden/Universal/PBR" /*end*/
 					LODDitheringTransition( IN.clipPos.xyz, unity_LODFade.x );
 				#endif
 
-				/*ase_local_var:wn*/float3 WorldNormal = normalize( IN.tSpace0.xyz );
-				/*ase_local_var:wt*/float3 WorldTangent = IN.tSpace1.xyz;
-				/*ase_local_var:wbt*/float3 WorldBiTangent = IN.tSpace2.xyz;
+				#if defined(ENABLE_TERRAIN_PERPIXEL_NORMAL)
+					float2 sampleCoords = (IN.lightmapUVOrVertexSH.zw / _TerrainHeightmapRecipSize.zw + 0.5f) * _TerrainHeightmapRecipSize.xy;
+					float3 WorldNormal = TransformObjectToWorldNormal(normalize(SAMPLE_TEXTURE2D(_TerrainNormalmapTexture, sampler_TerrainNormalmapTexture, sampleCoords).rgb * 2 - 1));
+					float3 WorldTangent = -cross(GetObjectToWorldMatrix()._13_23_33, WorldNormal);
+					float3 WorldBiTangent = cross(WorldNormal, -WorldTangent);
+				#else
+					/*ase_local_var:wn*/float3 WorldNormal = normalize( IN.tSpace0.xyz );
+					/*ase_local_var:wt*/float3 WorldTangent = IN.tSpace1.xyz;
+					/*ase_local_var:wbt*/float3 WorldBiTangent = IN.tSpace2.xyz;
+				#endif
 				/*ase_local_var:wp*/float3 WorldPosition = float3(IN.tSpace0.w,IN.tSpace1.w,IN.tSpace2.w);
 				/*ase_local_var:wvd*/float3 WorldViewDirection = _WorldSpaceCameraPos.xyz  - WorldPosition;
 				/*ase_local_var:sc*/float4 ShadowCoords = float4( 0, 0, 0, 0 );
@@ -901,7 +923,13 @@ Shader /*ase_name*/ "Hidden/Universal/PBR" /*end*/
 				#endif
 
 				inputData.vertexLighting = IN.fogFactorAndVertexLight.yzw;
-				inputData.bakedGI = SAMPLE_GI( IN.lightmapUVOrVertexSH.xy, IN.lightmapUVOrVertexSH.xyz, inputData.normalWS );
+				#if defined(ENABLE_TERRAIN_PERPIXEL_NORMAL)
+					float3 SH = SampleSH(inputData.normalWS.xyz);
+				#else
+					float3 SH = IN.lightmapUVOrVertexSH.xyz;
+				#endif
+
+				inputData.bakedGI = SAMPLE_GI( IN.lightmapUVOrVertexSH.xy, SH, inputData.normalWS );
 				#ifdef _ASE_BAKEDGI
 					inputData.bakedGI = BakedGI;
 				#endif
@@ -982,6 +1010,10 @@ Shader /*ase_name*/ "Hidden/Universal/PBR" /*end*/
 					float3 refraction = SHADERGRAPH_SAMPLE_SCENE_COLOR( projScreenPos ) * RefractionColor;
 					color.rgb = lerp( refraction, color.rgb, color.a );
 					color.a = 1;
+				#endif
+
+				#ifdef ASE_FINAL_COLOR_ALPHA_MULTIPLY
+					color.rgb *= color.a;
 				#endif
 
 				#ifdef ASE_FOG

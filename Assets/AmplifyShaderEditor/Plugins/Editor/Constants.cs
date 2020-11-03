@@ -298,6 +298,7 @@ namespace AmplifyShaderEditor
 
 		public readonly static string RenderTypeHelperStr = "RenderType";
 		public readonly static string RenderQueueHelperStr = "Queue";
+		public readonly static string DisableBatchingHelperStr = "DisableBatching";
 
 		public readonly static string DefaultShaderName = "New Amplify Shader";
 

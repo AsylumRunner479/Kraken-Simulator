@@ -87,7 +87,7 @@ namespace AmplifyShaderEditor
 		protected int m_masterNodeCategory = 0;// MasterNodeCategories.SurfaceShader;
 
 		[SerializeField]
-		protected bool m_samplingMacros = true;
+		protected bool m_samplingMacros = false;
 
 		[SerializeField]
 		protected string m_currentShaderData = string.Empty;
@@ -322,7 +322,10 @@ namespace AmplifyShaderEditor
 
 		protected void DrawSamplingMacros()
 		{
+			EditorGUI.BeginChangeCheck();
 			m_samplingMacros = EditorGUILayoutToggle( "Use Sampling Macros", m_samplingMacros );
+			if( EditorGUI.EndChangeCheck() )
+				ContainerGraph.SamplingMacros = SamplingMacros;
 		}
 
 		public void DrawShaderKeywords()
@@ -988,6 +991,15 @@ namespace AmplifyShaderEditor
 				m_shaderLOD = Mathf.Max( 0, value );
 			}
 		}
-		public bool SamplingMacros { get { return m_samplingMacros; } }
+		public bool SamplingMacros 
+		{
+			get { return m_samplingMacros; }
+			set
+			{
+				m_samplingMacros = value;
+				if( IsLODMainMasterNode )
+					ContainerGraph.SamplingMacros = value;
+			}
+		}
 	}
 }

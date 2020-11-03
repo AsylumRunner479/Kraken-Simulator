@@ -125,6 +125,11 @@ namespace AmplifyShaderEditor
 			m_externalReferences = null;
 		}
 
+		public void SetFreeForAll()
+		{
+			m_portRestrictions = -1;
+		}
+
 		public void AddPortForbiddenTypes( params WirePortDataType[] forbiddenTypes )
 		{
 			if( forbiddenTypes != null )
@@ -595,5 +600,6 @@ namespace AmplifyShaderEditor
 			set { m_repeatButtonState = value; }
 		}
 		public bool IsDummy { get { return m_isDummy; } }
+		public bool NotFreeForAllTypes { get { return m_portRestrictions != -1; } }
 	}
 }

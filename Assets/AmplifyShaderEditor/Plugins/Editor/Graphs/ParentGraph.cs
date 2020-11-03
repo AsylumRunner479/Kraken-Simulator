@@ -3360,10 +3360,11 @@ namespace AmplifyShaderEditor
 				nodesToDelete.Clear();
 			}
 
+			m_masterNodeId = newMasterNode.UniqueId;
+
 			if( refreshLinkedMasterNodes )
 				RefreshLinkedMasterNodes( true );
 
-			m_masterNodeId = newMasterNode.UniqueId;
 			newMasterNode.OnMaterialUpdatedEvent += OnMaterialUpdatedEvent;
 			newMasterNode.OnShaderUpdatedEvent += OnShaderUpdatedEvent;
 			newMasterNode.IsMainOutputNode = true;

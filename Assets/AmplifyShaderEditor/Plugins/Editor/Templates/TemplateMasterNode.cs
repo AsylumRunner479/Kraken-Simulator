@@ -314,10 +314,7 @@ namespace AmplifyShaderEditor
 			if( EditorGUI.EndChangeCheck() )
 				ContainerGraph.CurrentPrecision = m_currentPrecisionType;
 
-			EditorGUI.BeginChangeCheck();
 			DrawSamplingMacros();
-			if( EditorGUI.EndChangeCheck() )
-				ContainerGraph.SamplingMacros = SamplingMacros;
 
 			if( m_currentTemplate.CullModeData.DataCheck == TemplateDataCheck.Valid )
 				m_cullModeHelper.Draw( this );
@@ -679,9 +676,9 @@ namespace AmplifyShaderEditor
 				}
 
 				if( UIUtils.CurrentShaderVersion() > 18302 )
-					m_samplingMacros = Convert.ToBoolean( GetCurrentParam( ref nodeParams ) );
+					SamplingMacros = Convert.ToBoolean( GetCurrentParam( ref nodeParams ) );
 				else
-					m_samplingMacros = false;
+					SamplingMacros = false;
 			}
 			catch( Exception e )
 			{

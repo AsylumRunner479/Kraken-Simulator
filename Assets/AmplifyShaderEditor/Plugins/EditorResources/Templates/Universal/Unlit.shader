@@ -62,6 +62,9 @@ Shader /*ase_name*/ "Hidden/Universal/Unlit" /*end*/
 				false:RemoveDefine:pragma multi_compile_fog
 				true:SetDefine:ASE_FOG 1
 				false:RemoveDefine:ASE_FOG 1
+			Option:DOTS Instancing:false,true:false
+				true:SetDefine:pragma multi_compile _ DOTS_INSTANCING_ON
+				false:RemoveDefine:pragma multi_compile _ DOTS_INSTANCING_ON
 			Option:Meta Pass:false,true:false
 				true:IncludePass:Meta
 				true:ShowPort:Forward:Baked Albedo
@@ -69,9 +72,6 @@ Shader /*ase_name*/ "Hidden/Universal/Unlit" /*end*/
 				false,disable:ExcludePass:Meta
 				false:HidePort:Forward:Baked Albedo
 				false:HidePort:Forward:Baked Emission
-			Option:DOTS Instancing:false,true:false
-                true:SetDefine:pragma multi_compile _ DOTS_INSTANCING_ON
-                false:RemoveDefine:pragma multi_compile _ DOTS_INSTANCING_ON
 			Option:Extra Pre Pass:false,true:false
 				true:IncludePass:ExtraPrePass
 				false,disable:ExcludePass:ExtraPrePass

@@ -344,7 +344,7 @@ namespace AmplifyShaderEditor
 
 					for( int i = 0; i < InputList.Count; i++ )
 					{
-						dataCollector.AddToInput( InputList[ i ].NodeId, InputList[ i ].PropertyName, true );
+						dataCollector.AddToInput( InputList[ i ].NodeId, InputList[ i ].PropertyName, !InputList[ i ].IsDirective );
 					}
 				}
 				else
@@ -391,6 +391,9 @@ namespace AmplifyShaderEditor
 				//{
 				//	body.Add( OutlineBodyInstancedEnd[ i ] );
 				//}
+				
+				//Instanced block name must differ from used on main shader so it won't throw a duplicate name error
+				shaderName = shaderName+ "Outline";
 				bool openCBuffer = true;
 				if( customOutline )
 				{

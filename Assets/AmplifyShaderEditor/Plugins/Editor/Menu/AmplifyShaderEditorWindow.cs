@@ -2495,20 +2495,23 @@ namespace AmplifyShaderEditor
 							originNode.RecordObject( Constants.UndoCreateConnectionId );
 							targetNode.RecordObject( Constants.UndoCreateConnectionId );
 
-							if( !inputPort.CheckValidType( outputPort.DataType ) )
+							if( inputPort.NotFreeForAllTypes && outputPort.NotFreeForAllTypes )
 							{
-								UIUtils.ShowIncompatiblePortMessage( true, originNode, inputPort, targetNode, outputPort );
-								m_wireReferenceUtils.InvalidateReferences();
-								UseCurrentEvent();
-								return;
-							}
+								if( !inputPort.CheckValidType( outputPort.DataType ) )
+								{
+									UIUtils.ShowIncompatiblePortMessage( true, originNode, inputPort, targetNode, outputPort );
+									m_wireReferenceUtils.InvalidateReferences();
+									UseCurrentEvent();
+									return;
+								}
 
-							if( !outputPort.CheckValidType( inputPort.DataType ) )
-							{
-								UIUtils.ShowIncompatiblePortMessage( false, targetNode, outputPort, originNode, inputPort );
-								m_wireReferenceUtils.InvalidateReferences();
-								UseCurrentEvent();
-								return;
+								if( !outputPort.CheckValidType( inputPort.DataType ) )
+								{
+									UIUtils.ShowIncompatiblePortMessage( false, targetNode, outputPort, originNode, inputPort );
+									m_wireReferenceUtils.InvalidateReferences();
+									UseCurrentEvent();
+									return;
+								}
 							}
 
 							inputPort.DummyAdd( outputPort.NodeId, outputPort.PortId );
@@ -2564,20 +2567,23 @@ namespace AmplifyShaderEditor
 							originNode.RecordObject( Constants.UndoCreateConnectionId );
 							targetNode.RecordObject( Constants.UndoCreateConnectionId );
 
-							if( !inputPort.CheckValidType( outputPort.DataType ) )
+							if( inputPort.NotFreeForAllTypes && outputPort.NotFreeForAllTypes )
 							{
-								UIUtils.ShowIncompatiblePortMessage( true, targetNode, inputPort, originNode, outputPort );
-								m_wireReferenceUtils.InvalidateReferences();
-								UseCurrentEvent();
-								return;
-							}
+								if( !inputPort.CheckValidType( outputPort.DataType ) )
+								{
+									UIUtils.ShowIncompatiblePortMessage( true, targetNode, inputPort, originNode, outputPort );
+									m_wireReferenceUtils.InvalidateReferences();
+									UseCurrentEvent();
+									return;
+								}
 
-							if( !outputPort.CheckValidType( inputPort.DataType ) )
-							{
-								UIUtils.ShowIncompatiblePortMessage( false, originNode, outputPort, targetNode, inputPort );
-								m_wireReferenceUtils.InvalidateReferences();
-								UseCurrentEvent();
-								return;
+								if( !outputPort.CheckValidType( inputPort.DataType ) )
+								{
+									UIUtils.ShowIncompatiblePortMessage( false, originNode, outputPort, targetNode, inputPort );
+									m_wireReferenceUtils.InvalidateReferences();
+									UseCurrentEvent();
+									return;
+								}
 							}
 
 							inputPort.DummyAdd( m_wireReferenceUtils.OutputPortReference.NodeId, m_wireReferenceUtils.OutputPortReference.PortId );
@@ -3972,11 +3978,20 @@ namespace AmplifyShaderEditor
 									System.Type type = System.Type.GetType( typeStr );
 									if( type == null )
 									{
-										var editorAssembly = System.Reflection.Assembly.Load( "Assembly-CSharp-Editor" );
-										if( editorAssembly != null )
+#if UNITY_2017_3_OR_NEWER
+										try
 										{
-											type = editorAssembly.GetType( typeStr );
+											var editorAssembly = System.Reflection.Assembly.Load( "Assembly-CSharp-Editor" );
+											if( editorAssembly != null )
+											{
+												type = editorAssembly.GetType( typeStr );
+											}
 										}
+										catch( Exception )
+										{
+
+										}
+#endif
 									}
 									if( type != null )
 									{
@@ -4311,12 +4326,22 @@ namespace AmplifyShaderEditor
 									System.Type type = System.Type.GetType( typeStr );
 									if( type == null )
 									{
-										var editorAssembly = System.Reflection.Assembly.Load( "Assembly-CSharp-Editor" );
-										if( editorAssembly != null )
+#if UNITY_2017_3_OR_NEWER
+										try
 										{
-											type = editorAssembly.GetType( typeStr );
+											var editorAssembly = System.Reflection.Assembly.Load( "Assembly-CSharp-Editor" );
+											if( editorAssembly != null )
+											{
+												type = editorAssembly.GetType( typeStr );
+											}
 										}
+										catch( Exception )
+										{
+									
+										}
+#endif
 									}
+
 									if( type != null )
 									{
 										System.Type oldType = type;

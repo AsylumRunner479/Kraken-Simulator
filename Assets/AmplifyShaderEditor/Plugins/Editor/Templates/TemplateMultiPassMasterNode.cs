@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using System.Linq;
 
 namespace AmplifyShaderEditor
 {
@@ -575,6 +576,12 @@ namespace AmplifyShaderEditor
 
 		public void SetPropertyActionFromItem( TemplateModulesHelper module, TemplateActionItem item )
 		{
+			// this was added because when switching templates the m_mainMasterNodeRef was not properly set yet and was causing issues, there's probably a better place for this
+			if( !m_isMainOutputNode && m_mainMasterNodeRef == null )
+			{
+				m_mainMasterNodeRef = m_containerGraph.CurrentMasterNode as TemplateMultiPassMasterNode;
+			}
+
 			TemplateModulesHelper subShaderModule = m_isMainOutputNode ? m_subShaderModule : m_mainMasterNodeRef.SubShaderModule;
 			switch( item.PropertyAction )
 			{
@@ -903,6 +910,11 @@ namespace AmplifyShaderEditor
 				case PropertyActionsEnum.RenderQueue:
 				{
 					module.TagsHelper.AddSpecialTag( TemplateSpecialTags.Queue, item );
+				}
+				break;
+				case PropertyActionsEnum.DisableBatching:
+				{
+					module.TagsHelper.AddSpecialTag( TemplateSpecialTags.DisableBatching, item );
 				}
 				break;
 			}
@@ -1670,10 +1682,7 @@ namespace AmplifyShaderEditor
 				if( EditorGUI.EndChangeCheck() )
 					ContainerGraph.CurrentPrecision = m_currentPrecisionType;
 
-				EditorGUI.BeginChangeCheck();
 				DrawSamplingMacros();
-				if( EditorGUI.EndChangeCheck() )
-					ContainerGraph.SamplingMacros = SamplingMacros;
 
 				m_drawInstancedHelper.Draw( this );
 				m_fallbackHelper.Draw( this );
@@ -2240,6 +2249,30 @@ namespace AmplifyShaderEditor
 				}
 			}
 #endif
+
+			// here we add ASE attributes to the material properties that allows materials to communicate with ASE
+			if( m_templateMultiPass.SRPtype != TemplateSRPType.BuiltIn )
+			{
+				List<PropertyDataCollector> list = new List<PropertyDataCollector>( currDataCollector.PropertiesDict.Values );
+				list.Sort( ( x, y ) => { return x.OrderIndex.CompareTo( y.OrderIndex ); } );
+				for( int i = 0; i < list.Count; i++ )
+				{
+					if( !( list[ i ].PropertyName.Contains( "[HideInInspector]" ) || list[ i ].PropertyName.Contains( "//" ) ) )
+					{
+						list[ i ].PropertyName = "[ASEBegin]" + list[ i ].PropertyName;
+						break;
+					}
+				}
+
+				for( int i = list.Count - 1; i >= 0; i-- )
+				{
+					if( !( list[ i ].PropertyName.Contains( "[HideInInspector]" ) || list[ i ].PropertyName.Contains( "//" ) ) )
+					{
+						list[ i ].PropertyName = "[ASEEnd]" + list[ i ].PropertyName;
+						break;
+					}
+				}
+			}
 
 			m_templateMultiPass.SetPropertyData( currDataCollector.BuildUnformatedPropertiesStringArr() );
 		}
@@ -2898,9 +2931,9 @@ namespace AmplifyShaderEditor
 				}
 
 				if( UIUtils.CurrentShaderVersion() > 18302 )
-					m_samplingMacros = Convert.ToBoolean( GetCurrentParam( ref nodeParams ) );
+					SamplingMacros = Convert.ToBoolean( GetCurrentParam( ref nodeParams ) );
 				else
-					m_samplingMacros = false;
+					SamplingMacros = false;
 
 				//if( m_templateMultiPass != null && !m_templateMultiPass.IsSinglePass )
 				//{
@@ -2914,7 +2947,6 @@ namespace AmplifyShaderEditor
 
 			m_containerGraph.CurrentCanvasMode = NodeAvailability.TemplateShader;
 			m_containerGraph.CurrentPrecision = m_currentPrecisionType;
-			m_containerGraph.SamplingMacros = m_samplingMacros;
 		}
 
 		public override void WriteToString( ref string nodeInfo, ref string connectionsInfo )
@@ -3099,7 +3131,7 @@ namespace AmplifyShaderEditor
 					}
 				}
 
-				m_samplingMacros = false;
+				SamplingMacros = false;
 			}
 			catch( Exception e )
 			{
