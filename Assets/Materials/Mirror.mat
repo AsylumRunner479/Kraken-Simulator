@@ -45,11 +45,11 @@ Material:
     - _Metallic1: 0
     - __dirty: 0
     - _light: 0
-    - _light1: 1
+    - _light1: 0.1
     m_Colors:
     - _Color0: {r: 0, g: 0, b: 0, a: 0}
-    - _Color1: {r: 2.670157, g: 2.670157, b: 2.670157, a: 0}
-    - _Color2: {r: 0, g: 0, b: 0, a: 0}
+    - _Color1: {r: 0, g: 0, b: 0, a: 0}
+    - _Color2: {r: 1, g: 1, b: 1, a: 0}
     - _Color3: {r: 0, g: 0, b: 0, a: 0}
     - _Color4: {r: 0, g: 0, b: 0, a: 0}
     - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
